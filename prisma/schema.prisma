@@ -1,0 +1,294 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Country {
+  AUSTRIA
+  GERMANY
+}
+
+enum PartnerStatus {
+  OPEN
+  FINISHED
+  LEAD
+}
+
+enum CourseStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum CourseCategory {
+  INTENSIVE
+  EXTREME
+  ONLINE
+  WORKSHOP
+  OTHER
+}
+
+enum SessionStatus {
+  OPEN
+  COMPLETED
+  RESCHEDULED
+  CANCELLED
+  ARCHIVED
+}
+
+enum ParticipantStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum BookingStatus {
+  REGISTERED
+  CONFIRMED
+  CANCELLED
+  ARCHIVED
+}
+
+enum PaymentStatus {
+  OPEN
+  PAID
+  OVERDUE
+}
+
+enum LeadStatus {
+  NEW
+  CONTACT
+  WON
+  LOST
+}
+
+enum HistoryAction {
+  CREATED
+  UPDATED
+  ARCHIVED
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  modules     Json
+  features    Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  email          String    @unique
+  name           String?
+  hashedPassword String?
+  image          String?
+  emailVerified  DateTime?
+  roleId         Int?
+  role           Role?     @relation(fields: [roleId], references: [id])
+  partnerNotes   PartnerNote[]
+  recordedEmailLogs EmailLog[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  histories      History[] @relation("UserChanges")
+}
+
+model Account {
+  id                 Int       @id @default(autoincrement())
+  userId             Int
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Partner {
+  id                 Int             @id @default(autoincrement())
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  name               String
+  address            String?
+  country            Country
+  region             String?
+  email              String?
+  phone              String?
+  ceo                String?
+  uid                String?
+  companyRegister    String?
+  status             PartnerStatus   @default(OPEN)
+  bankName           String?
+  iban               String?
+  bic                String?
+  rating             Json?
+  isArchived         Boolean         @default(false)
+  notes              PartnerNote[]
+  sessions           CourseSession[]
+  emailLogs          EmailLog[]
+}
+
+model PartnerNote {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  content   String
+  authorId  Int?
+  author    User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  partnerId Int
+  partner   Partner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+}
+
+model Course {
+  id            Int             @id @default(autoincrement())
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  courseNumber  String          @unique
+  title         String
+  durationHours Float
+  grossPrice    Decimal
+  taxRate       Int
+  netPrice      Decimal
+  status        CourseStatus    @default(ACTIVE)
+  category      CourseCategory
+  description   String?
+  sessions      CourseSession[]
+  documents     Document[]
+}
+
+model CourseSession {
+  id              Int             @id @default(autoincrement())
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  sessionNumber   String          @unique
+  courseId        Int
+  course          Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  partnerId       Int?
+  partner         Partner?        @relation(fields: [partnerId], references: [id])
+  startDate       DateTime
+  endDate         DateTime?
+  status          SessionStatus   @default(OPEN)
+  bookings        Booking[]
+  isArchived      Boolean         @default(false)
+}
+
+model Participant {
+  id                Int               @id @default(autoincrement())
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  participantNumber String            @unique
+  firstName         String
+  lastName          String
+  address           String?
+  country           Country
+  region            String?
+  email             String            @unique
+  phone             String?
+  birthDate         DateTime?
+  status            ParticipantStatus @default(ACTIVE)
+  bookings          Booking[]
+  emailLogs         EmailLog[]
+}
+
+model Booking {
+  id              Int           @id @default(autoincrement())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  participantId   Int
+  courseSessionId Int
+  status          BookingStatus @default(REGISTERED)
+  paymentStatus   PaymentStatus @default(OPEN)
+  amountGross     Decimal
+  taxRate         Int
+  amountNet       Decimal
+  paymentRef      String?
+  isArchived      Boolean       @default(false)
+  participant     Participant   @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  courseSession   CourseSession @relation(fields: [courseSessionId], references: [id], onDelete: Cascade)
+}
+
+model Document {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  courseId   Int
+  title      String
+  version    String
+  fileUrl    String
+  signedUrl  String?
+  mimeType   String?
+  isArchived Boolean   @default(false)
+  course     Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
+
+model Lead {
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  name      String
+  email     String?
+  phone     String?
+  status    LeadStatus @default(NEW)
+  source    String?
+  notes     String?
+}
+
+model EmailLog {
+  id             Int        @id @default(autoincrement())
+  createdAt      DateTime   @default(now())
+  subject        String
+  body           String
+  direction      String
+  messageId      String?
+  threadId       String?
+  partnerId      Int?
+  participantId  Int?
+  partner        Partner?   @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  participant     Participant? @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  recordedById   Int?
+  recordedBy     User?      @relation(fields: [recordedById], references: [id], onDelete: SetNull)
+  module         String?
+  recordId       Int?
+}
+
+model History {
+  id        Int           @id @default(autoincrement())
+  createdAt DateTime      @default(now())
+  module    String
+  recordId  Int
+  action    HistoryAction
+  changes   Json
+  authorId  Int?
+  author    User?         @relation("UserChanges", fields: [authorId], references: [id], onDelete: SetNull)
+}
