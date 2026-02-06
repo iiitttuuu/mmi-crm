@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma generate && npx prisma db push && next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint --config .eslintrc.json . --ext .ts,.tsx,.js,.jsx",
     "seed": "npx prisma generate && npx tsx scripts/seed.ts",
