@@ -1,8 +1,8 @@
-import './globals.css'
+import '@/styles/globals.css'
 
 export const metadata = {
   title: 'Music Mission Controll CRM',
-  description: 'Sicheres CRM für Partner, Kurse, Kursteilnehmer und Buchungen unter der Domain musicmissioncontroll.com',
+  description: 'Sicheres CRM für Partner, Kurse, Kursteilnehmer und Buchungen unter der Domain musicmissioncontrol.com',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
