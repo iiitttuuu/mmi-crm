@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint --config .eslintrc.json . --ext .ts,.tsx,.js,.jsx",
-    "seed": "ts-node --esm scripts/seed.ts"
+    "seed": "ts-node --esm scripts/seed.ts",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
