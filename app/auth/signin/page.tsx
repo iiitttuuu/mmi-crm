@@ -1,9 +1,11 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 
 export default function SignInPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -19,6 +21,11 @@ export default function SignInPage() {
 
     if (result?.error) {
       setError(result.error)
+      return
+    }
+
+    if (result?.ok) {
+      router.replace('/')
     }
   }
 
