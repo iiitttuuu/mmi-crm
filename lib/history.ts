@@ -1,6 +1,8 @@
 import type { Prisma } from '@prisma/client'
 import { prisma } from './prisma'
 
+type HistoryActionType = Prisma.HistoryCreateInput['action']
+
 export async function recordHistory({
   module,
   recordId,
@@ -10,7 +12,7 @@ export async function recordHistory({
 }: {
   module: string
   recordId: number | null
-  action: string
+  action: HistoryActionType
   changes: Prisma.InputJsonValue
   authorId?: number | null
 }) {
