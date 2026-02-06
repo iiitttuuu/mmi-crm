@@ -10,7 +10,6 @@ declare global {
 const prismaClient =
   global.__mmiPrismaClient ??
   new PrismaClient({
-    datasources: prismaConfig.datasources,
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   })
 
