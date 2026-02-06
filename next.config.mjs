@@ -1,10 +1,3 @@
-const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
-  eslint: {
-    dirs: ['app', 'components', 'lib', 'scripts'],
-  },
-}
+const nextConfig = {}
 
 export default nextConfig
