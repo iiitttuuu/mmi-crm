@@ -6,11 +6,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint --config .eslintrc.json . --ext .ts,.tsx,.js,.jsx",
     "seed": "ts-node --esm scripts/seed.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "npx prisma generate"
   },
   "keywords": [],
   "author": "",
