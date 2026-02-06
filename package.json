@@ -9,7 +9,7 @@
     "build": "npx prisma generate && npx prisma db push && next build",
     "start": "next start",
     "lint": "eslint --config .eslintrc.json . --ext .ts,.tsx,.js,.jsx",
-    "seed": "ts-node --esm scripts/seed.ts",
+    "seed": "npx prisma generate && npx tsx scripts/seed.ts",
     "postinstall": "npx prisma generate"
   },
   "keywords": [],
